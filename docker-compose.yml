@@ -1,0 +1,16 @@
+services:
+  macao-zhaobiao:
+    build: .
+    container_name: macao-zhaobiao-v2
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      REFRESH_INTERVAL: "${REFRESH_INTERVAL:-43200}"
+      REFRESH_TOKEN: "${REFRESH_TOKEN:-}"
+      FETCH_WORKERS: "${FETCH_WORKERS:-4}"
+      TENDER_SOURCE_URL: "${TENDER_SOURCE_URL:-https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=}"
+    volumes:
+      - tender-data:/data
+volumes:
+  tender-data:
