@@ -16,3 +16,4 @@ body{font-size:16px}.site-header nav a,.site-header nav button{font-size:14px}.h
 @media(max-width:700px){.tender-tabs{display:grid;grid-template-columns:repeat(3,1fr)}.tender-tabs .category-tab{min-width:0}.year-filter{grid-column:1/4;border-left:1px solid #c8c8c0}.tender-card .card-items{padding-left:17px;padding-right:17px}.tender-card .card-items dl{grid-template-columns:1fr 1fr}.detail-dates{grid-template-columns:1fr}.source-note{grid-template-columns:1fr}.source-mark{width:58px;height:58px}.hero h1{font-size:51px}}
 .latest-button{width:100%;border-right:0;border-left:0;border-bottom:0;background:transparent;color:inherit;text-align:left;cursor:pointer;font-family:inherit}.latest-button:first-child{border-top:1px solid var(--line)}
 .agency-card>footer>a{color:var(--green);font-size:12px;text-decoration:none}.agency-card .card-items{max-height:430px;overflow:auto}
+.category-tabs{grid-template-columns:repeat(9,1fr)}

@@ -23,6 +23,29 @@ REFRESH_TOKEN = os.getenv("REFRESH_TOKEN", "")
 FETCH_WORKERS = min(8, max(1, int(os.getenv("FETCH_WORKERS", "4"))))
 refresh_lock = threading.Lock()
 
+# Categories and current entity names published by the Macao Government Portal.
+# Gazette-only or former entity names deliberately fall back to 「其他」.
+CATEGORY_AGENCIES = {
+    "行政長官直屬機關": {"行政長官辦公室","行政會秘書處","政府總部事務局","政策研究和區域發展局","澳門基金會","新聞局","個人資料保護局","公共資產監督管理局","澳門特別行政區駐北京辦事處","在台灣澳門經濟文化辦事處","澳門駐里斯本經濟貿易辦事處","澳門駐布魯塞爾歐盟經濟貿易辦事處","澳門駐世界貿易組織經濟貿易辦事處","人才發展委員會"},
+    "行政法務範疇": {"行政法務司司長辦公室","行政公職局","法務局","身份證明局","市政署","退休基金會","法律及司法培訓中心"},
+    "經濟財政範疇": {"經濟財政司司長辦公室","經濟及科技發展局","財政局","旅遊局","博彩監察協調局","勞工事務局","招商投資促進局","澳門金融管理局","科學技術發展基金","統計暨普查局","消費者委員會"},
+    "保安範疇": {"保安司司長辦公室","警察總局","中華人民共和國澳門特別行政區海關","治安警察局","司法警察局","消防局","懲教管理局","澳門保安部隊事務局","澳門保安部隊高等學校"},
+    "社會文化範疇": {"社會文化司司長辦公室","教育及青年發展局","文化局","體育局","衛生局","藥物監督管理局","離島醫療綜合體北京協和醫院澳門醫學中心","社會工作局","社會保障基金","文化發展基金","澳門大學","澳門理工大學","澳門旅遊大學"},
+    "運輸工務範疇": {"運輸工務司司長辦公室","土地工務局","公共建設局","海事及水務局","環境保護局","交通事務局","民航局","郵電局","房屋局","地球物理氣象局"},
+    "廉政審計範疇": {"廉政公署","審計署"},
+    "立法司法範疇的行政部門": {"終審法院院長辦公室","檢察長辦公室","立法會輔助部門"},
+}
+AGENCY_ALIASES = {"海關": "中華人民共和國澳門特別行政區海關", "澳門特別行政區海關": "中華人民共和國澳門特別行政區海關"}
+
+
+def agency_category(name):
+    official_name = AGENCY_ALIASES.get(name, name)
+    return next((category for category, agencies in CATEGORY_AGENCIES.items() if official_name in agencies), "其他")
+
+
+def clean_summary(value):
+    return re.sub(r"^(?:通告|公告)一則\s*[，,、：:]?\s*(?:關於)?\s*", "", value).strip()
+
 
 def connect():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -75,7 +98,7 @@ class GazetteParser(HTMLParser):
             date = re.search(r"(20\d{2})/(\d{2})/(\d{2})", second)
             if agency_link and date:
                 url, agency = agency_link
-                summary = re.sub(rf"^{re.escape(agency)}\s*[,，]\s*", "", first).strip()
+                summary = clean_summary(re.sub(rf"^{re.escape(agency)}\s*[,，]\s*", "", first).strip())
                 item_id = url.rstrip("/").split("/")[-1]
                 self.rows.append({"id": item_id, "agency": agency, "summary": summary,
                     "published_date": "-".join(date.groups()), "detail_url": urljoin(SOURCE_URL, url),
@@ -131,10 +154,12 @@ def dashboard(db):
     names=[r[0] for r in db.execute("SELECT DISTINCT agency FROM bulletin_tenders ORDER BY agency")]
     for name in names:
         items=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders WHERE agency=? ORDER BY published_date DESC,id DESC LIMIT 5",(name,))]
-        agencies.append({"name":name,"items":items})
+        agencies.append({"name":name,"category":agency_category(name),"items":items})
     latest=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
     meta=dict(db.execute("SELECT key,value FROM metadata"))
-    return {"agencies":agencies,"latest":latest,"agency_count":len(agencies),
+    category_order = list(CATEGORY_AGENCIES) + ["其他"]
+    categories = [{"name": category, "count": sum(a["category"] == category for a in agencies)} for category in category_order]
+    return {"agencies":agencies,"categories":categories,"latest":latest,"agency_count":len(agencies),
         "total":db.execute("SELECT count(*) FROM bulletin_tenders").fetchone()[0],
         "last_refresh":meta.get("last_refresh"),"last_error":meta.get("last_error"),"source_url":SOURCE_URL}
 

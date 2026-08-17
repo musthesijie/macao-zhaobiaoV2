@@ -4,6 +4,8 @@
 
 V2 沿用原版 [`macao-zhaobiao`](https://github.com/musthesijie/macao-zhaobiao) 的视觉系统。采集器自动遍历公报事项分类的全部分页，以公报链接去重、按公共机构分组，并在看板为每个机构展示最新五则信息。
 
+机构分类以澳门政府入口网站的[公共部门及其他机构](https://www.gov.mo/zh-hant/about-government/departments-and-agencies/)目录为准；公报中没有列入该目录的历史机构或其他实体统一归入“其他”。列表会自动移除“公告一则／通告一则”等公文套语。
+
 ## Docker 一键部署
 
 ```bash

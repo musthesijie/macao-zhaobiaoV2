@@ -1,5 +1,5 @@
 import unittest
-from app import GazetteParser
+from app import GazetteParser, agency_category, clean_summary
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -14,7 +14,16 @@ class GazetteParserTests(unittest.TestCase):
         self.assertEqual(parser.rows[0]["agency"], "衛生局")
         self.assertEqual(parser.rows[0]["id"], "99622")
         self.assertEqual(parser.rows[0]["published_date"], "2026-08-12")
-        self.assertEqual(parser.rows[0]["summary"], "公告一則，關於供應醫療消耗品的公開招標。")
+        self.assertEqual(parser.rows[0]["summary"], "供應醫療消耗品的公開招標。")
+
+    def test_summary_prefixes_are_removed(self):
+        self.assertEqual(clean_summary("通告一則，關於樓宇管理服務的公開招標。"), "樓宇管理服務的公開招標。")
+        self.assertEqual(clean_summary("公告一則，供應設備。"), "供應設備。")
+
+    def test_agencies_follow_government_portal_categories(self):
+        self.assertEqual(agency_category("市政署"), "行政法務範疇")
+        self.assertEqual(agency_category("房屋局"), "運輸工務範疇")
+        self.assertEqual(agency_category("未列出的歷史機構"), "其他")
 
 
 if __name__ == "__main__":
