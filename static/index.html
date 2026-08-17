@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="澳门公开招标信息聚合检索平台"><title>澳门招标 · Macao Tender</title>
+<link rel="stylesheet" href="/style.css"></head><body>
+<header><div class="nav wrap"><a class="brand" href="/"><span class="seal">澳</span><span>澳门招标<small>MACAO TENDER</small></span></a><nav><a class="active">招标资讯</a><a href="https://data.gov.mo/Detail?id=7da15d0f-968e-495c-971a-c30a05049884" target="_blank" rel="noopener">数据来源 ↗</a></nav></div></header>
+<main><section class="hero"><div class="wrap hero-inner"><div><p class="eyebrow">PUBLIC PROCUREMENT · MACAO</p><h1>发现澳门的<br><em>公开招标机会</em></h1><p class="lead">汇集市政署公开采购资讯，自动刷新、快速检索，让每一个商业机会更清晰。</p></div><div class="hero-card"><span>实时数据收录</span><strong id="heroTotal">—</strong><small>项公开招标记录</small><div class="live"><i></i> 数据服务运行中</div></div></div></section>
+<section class="wrap search-panel"><div class="search"><span>⌕</span><input id="keyword" placeholder="输入项目名称、招标编号或关键词"><button id="searchBtn">搜索招标</button></div><div class="filters"><button class="filter active" data-status="all">全部项目</button><button class="filter" data-status="active">正在招标</button><button class="filter" data-status="closed">已截止</button><select id="year"><option value="">全部年份</option></select><button id="refresh" class="refresh">↻ 刷新数据</button></div></section>
+<section class="wrap content"><div class="section-head"><div><p class="eyebrow dark">LATEST TENDERS</p><h2>最新招标资讯</h2></div><p>共找到 <b id="total">—</b> 个项目</p></div><div id="list" class="grid"><div class="loading">正在载入公开招标数据…</div></div><div id="pagination" class="pagination"></div></section></main>
+<dialog id="detail"><button class="close" aria-label="关闭">×</button><div id="detailBody"></div></dialog>
+<footer><div class="wrap"><div class="brand inverse"><span class="seal">澳</span><span>澳门招标<small>MACAO TENDER</small></span></div><p>数据来源：澳门特别行政区政府数据开放平台 · 市政署</p><p id="updated">最后同步：—</p></div></footer><script src="/app.js"></script></body></html>
