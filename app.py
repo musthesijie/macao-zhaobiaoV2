@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent
@@ -162,7 +162,7 @@ class Handler(SimpleHTTPRequestHandler):
             db.close()
             return self.json_response({"items": [to_public(r) for r in rows], "total": total, "page": page, "size": size, "years": years})
         if parsed.path.startswith("/api/tenders/"):
-            number = parsed.path.removeprefix("/api/tenders/")
+            number = unquote(parsed.path.removeprefix("/api/tenders/"))
             db = connect(); row = db.execute("SELECT * FROM tenders WHERE no=?", (number,)).fetchone(); db.close()
             return self.json_response(to_public(row) if row else {"error": "未找到"}, 200 if row else 404)
         if parsed.path.startswith("/api/"):

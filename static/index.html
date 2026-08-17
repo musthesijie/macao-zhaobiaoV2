@@ -1,10 +1,85 @@
 <!doctype html>
-<html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="澳门公开招标信息聚合检索平台"><title>澳门招标 · Macao Tender</title>
-<link rel="stylesheet" href="/style.css"></head><body>
-<header><div class="nav wrap"><a class="brand" href="/"><span class="seal">澳</span><span>澳门招标<small>MACAO TENDER</small></span></a><nav><a class="active">招标资讯</a><a href="https://data.gov.mo/Detail?id=7da15d0f-968e-495c-971a-c30a05049884" target="_blank" rel="noopener">数据来源 ↗</a></nav></div></header>
-<main><section class="hero"><div class="wrap hero-inner"><div><p class="eyebrow">PUBLIC PROCUREMENT · MACAO</p><h1>发现澳门的<br><em>公开招标机会</em></h1><p class="lead">汇集市政署公开采购资讯，自动刷新、快速检索，让每一个商业机会更清晰。</p></div><div class="hero-card"><span>实时数据收录</span><strong id="heroTotal">—</strong><small>项公开招标记录</small><div class="live"><i></i> 数据服务运行中</div></div></div></section>
-<section class="wrap search-panel"><div class="search"><span>⌕</span><input id="keyword" placeholder="输入项目名称、招标编号或关键词"><button id="searchBtn">搜索招标</button></div><div class="filters"><button class="filter active" data-status="all">全部项目</button><button class="filter" data-status="active">正在招标</button><button class="filter" data-status="closed">已截止</button><select id="year"><option value="">全部年份</option></select><button id="refresh" class="refresh">↻ 刷新数据</button></div></section>
-<section class="wrap content"><div class="section-head"><div><p class="eyebrow dark">LATEST TENDERS</p><h2>最新招标资讯</h2></div><p>共找到 <b id="total">—</b> 个项目</p></div><div id="list" class="grid"><div class="loading">正在载入公开招标数据…</div></div><div id="pagination" class="pagination"></div></section></main>
-<dialog id="detail"><button class="close" aria-label="关闭">×</button><div id="detailBody"></div></dialog>
-<footer><div class="wrap"><div class="brand inverse"><span class="seal">澳</span><span>澳门招标<small>MACAO TENDER</small></span></div><p>数据来源：澳门特别行政区政府数据开放平台 · 市政署</p><p id="updated">最后同步：—</p></div></footer><script src="/app.js"></script></body></html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="集中瀏覽澳門市政署公開招標資訊">
+  <title>H｜澳門公開招標資訊看板 V2</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <button class="brand" id="refreshAllButton" type="button" aria-label="刷新公開招標資料" title="刷新公開招標資料">H</button>
+    <nav aria-label="主要導覽">
+      <a href="#latest">最新資訊</a>
+      <a href="#tenders">全部招標</a>
+      <button id="sourcesButton">資料來源 ↗</button>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="signal"><i></i> MACAO PUBLIC TENDER RADAR · V2</span>
+        <h1>澳門政府<br><strong>公開招標雷達</strong></h1>
+        <p>接入澳門特別行政區政府數據開放平台，集中整理市政署公開招標項目、公告、招標文件、開標及判給結果。</p>
+        <a class="primary-action" href="#latest">查看最新商機 <span>↓</span></a>
+      </div>
+      <div class="hero-metrics" aria-label="看板統計">
+        <div class="metric accent"><span>收錄項目</span><strong id="tenderCount">—</strong><small>TENDERS</small></div>
+        <div class="metric"><span>正在招標</span><strong id="activeCount">—</strong><small>ACTIVE</small></div>
+        <div class="metric wide"><span>最近同步</span><strong id="updatedAt">等待資料</strong><small id="coverageText">澳門政府數據開放平台 · 市政署</small></div>
+      </div>
+    </section>
+
+    <div class="refresh-strip" role="status" aria-live="polite">
+      <span><i id="refreshIndicator"></i><b id="refreshStatus">準備同步公開招標資料</b></span>
+      <span id="refreshProgress">DATA.GOV.MO</span>
+    </div>
+
+    <section class="latest-section page-section" id="latest">
+      <div class="section-heading">
+        <div><span class="section-index">01</span><p>MARKET PULSE</p><h2>全澳最新發布</h2></div>
+        <p class="section-intro">來自澳門政府數據開放平台，依公告日期排列的最新 10 條市政署公開招標資訊。</p>
+      </div>
+      <div class="latest-board">
+        <div class="latest-head"><span>排名 / 公告日期</span><span>公開招標項目</span><span>採購編號</span><span>狀態</span><span></span></div>
+        <div id="latestList" class="latest-list" aria-live="polite"><div class="board-empty"><b>正在載入招標資料</b><span>請稍候。</span></div></div>
+      </div>
+    </section>
+
+    <section class="department-section page-section" id="tenders">
+      <div class="section-heading department-heading">
+        <div><span class="section-index">02</span><p>TENDER DIRECTORY</p><h2>全部公開招標</h2></div>
+        <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="搜尋項目或採購編號" aria-label="搜尋項目或採購編號"></label>
+      </div>
+      <nav class="category-tabs tender-tabs" aria-label="招標狀態">
+        <button class="category-tab active" data-status="all"><span>01</span><b>全部項目</b><small id="allCount">—</small></button>
+        <button class="category-tab" data-status="active"><span>02</span><b>正在招標</b><small id="openCount">—</small></button>
+        <button class="category-tab" data-status="closed"><span>03</span><b>已截止</b><small id="closedCount">—</small></button>
+        <label class="year-filter"><span>公告年份</span><select id="yearSelect"><option value="">全部年份</option></select></label>
+      </nav>
+      <div class="category-summary"><div><span>PUBLIC TENDERS</span><h3 id="directoryTitle">全部項目</h3></div><p id="resultSummary">正在整理公開招標資料。</p></div>
+      <div id="tenderGrid" class="agency-grid tender-grid"></div>
+      <nav id="pagination" class="pagination" aria-label="分頁"></nav>
+    </section>
+  </main>
+
+  <footer><div class="footer-brand">H</div><p>澳門公開招標資訊看板 V2<br><span>資料來自澳門政府數據開放平台；項目內容及日期請以市政署原始來源為準。</span></p><a href="#top">返回頂部 ↑</a></footer>
+
+  <dialog id="sourcesDialog">
+    <div class="dialog-heading"><div><small>OFFICIAL DATA SOURCE</small><h2>資料來源</h2></div><button id="closeDialog" aria-label="關閉">×</button></div>
+    <div class="source-note">
+      <span class="source-mark">MO</span>
+      <div><h3>澳門特別行政區政府數據開放平台</h3><p>公開招標項目的資訊列表 · 資料提供者：市政署</p><a href="https://data.gov.mo/Detail?id=7da15d0f-968e-495c-971a-c30a05049884#APIInformation11" target="_blank" rel="noreferrer">查看官方 API 資訊 ↗</a></div>
+    </div>
+  </dialog>
+  <dialog id="detailDialog" class="detail-dialog">
+    <div class="dialog-heading"><div><small id="detailNo">TENDER DETAIL</small><h2 id="detailTitle">項目詳情</h2></div><button id="closeDetail" aria-label="關閉">×</button></div>
+    <p id="detailPortuguese" class="detail-portuguese"></p>
+    <div id="detailDates" class="detail-dates"></div>
+    <div id="detailLinks" class="detail-links"></div>
+  </dialog>
+  <script src="/app.js" defer></script>
+</body>
+</html>

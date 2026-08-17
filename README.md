@@ -2,6 +2,8 @@
 
 澳门市政署公开招标资讯的自动收录、检索和展示网站。数据由[澳门政府数据开放平台](https://data.gov.mo/Detail?id=7da15d0f-968e-495c-971a-c30a05049884)提供。
 
+V2 沿用原版 [`macao-zhaobiao`](https://github.com/musthesijie/macao-zhaobiao) 的「H｜澳門公共採購資訊看板」视觉系统，包括黑色与荧光绿色主色、雷达式首页、指标方格、最新资讯排名看板及双栏目录；数据内容则改为上述开放平台 API 提供的市政署公开招标资料。
+
 ## Docker 一键部署
 
 ```bash
