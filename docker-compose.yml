@@ -6,9 +6,10 @@ services:
     ports:
       - "${PORT:-8080}:8080"
     environment:
-      REFRESH_INTERVAL: "${REFRESH_INTERVAL:-21600}"
+      REFRESH_INTERVAL: "${REFRESH_INTERVAL:-43200}"
       REFRESH_TOKEN: "${REFRESH_TOKEN:-}"
-      TENDER_APP_CODE: "${TENDER_APP_CODE:-09d43a591fba407fb862412970667de4}"
+      FETCH_WORKERS: "${FETCH_WORKERS:-4}"
+      TENDER_SOURCE_URL: "${TENDER_SOURCE_URL:-https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=}"
     volumes:
       - tender-data:/data
 volumes:
