@@ -2,7 +2,6 @@ FROM python:3.13-slim
 WORKDIR /app
 COPY app.py ./
 COPY static ./static
-COPY config ./config
 RUN mkdir -p /data && useradd -r -u 10001 app && chown -R app:app /data /app
 USER app
 ENV PORT=8080 DATA_DIR=/data PYTHONUNBUFFERED=1

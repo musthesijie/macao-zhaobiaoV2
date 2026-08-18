@@ -8,7 +8,6 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
-from functools import lru_cache
 from html.parser import HTMLParser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -23,7 +22,6 @@ REFRESH_SECONDS = max(1800, int(os.getenv("REFRESH_INTERVAL", "43200")))
 REFRESH_TOKEN = os.getenv("REFRESH_TOKEN", "")
 FETCH_WORKERS = min(8, max(1, int(os.getenv("FETCH_WORKERS", "4"))))
 refresh_lock = threading.Lock()
-SOURCE_DIRECTORY_PATH = ROOT / "config" / "source-urls.json"
 
 # Categories and current entity names published by the Macao Government Portal.
 # Gazette-only or former entity names deliberately fall back to 「其他」.
@@ -38,20 +36,6 @@ CATEGORY_AGENCIES = {
     "立法司法範疇的行政部門": {"終審法院院長辦公室","檢察長辦公室","立法會輔助部門"},
 }
 AGENCY_ALIASES = {"海關": "中華人民共和國澳門特別行政區海關", "澳門特別行政區海關": "中華人民共和國澳門特別行政區海關"}
-
-
-@lru_cache(maxsize=1)
-def source_directory():
-    with SOURCE_DIRECTORY_PATH.open(encoding="utf-8") as source_file:
-        return json.load(source_file)
-
-
-def agency_source(name):
-    directory = source_directory()["agencies"]
-    candidates = {name, AGENCY_ALIASES.get(name, name)}
-    if "海關" in name: candidates.add("澳門特別行政區海關")
-    match = next((item for item in directory if item["name"] in candidates), None)
-    return match["buttonUrl"] if match else SOURCE_URL
 
 
 def agency_category(name):
@@ -170,7 +154,7 @@ def dashboard(db):
     names=[r[0] for r in db.execute("SELECT DISTINCT agency FROM bulletin_tenders ORDER BY agency")]
     for name in names:
         items=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders WHERE agency=? ORDER BY published_date DESC,id DESC LIMIT 5",(name,))]
-        agencies.append({"name":name,"category":agency_category(name),"source_url":agency_source(name),"items":items})
+        agencies.append({"name":name,"category":agency_category(name),"items":items})
     latest=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
     meta=dict(db.execute("SELECT key,value FROM metadata"))
     category_order = list(CATEGORY_AGENCIES) + ["其他"]
@@ -194,7 +178,6 @@ class Handler(SimpleHTTPRequestHandler):
         if parsed.path=="/healthz": return self.json_response({"ok":True})
         if parsed.path=="/api/dashboard":
             db=connect(); result=dashboard(db); db.close(); return self.json_response(result)
-        if parsed.path=="/api/sources": return self.json_response(source_directory())
         if parsed.path=="/api/tenders":
             q=parse_qs(parsed.query); agency=q.get("agency",[""])[0]; keyword=q.get("q",[""])[0]
             where=["1=1"]; params=[]
