@@ -10,6 +10,7 @@ services:
       REFRESH_TOKEN: "${REFRESH_TOKEN:-}"
       FETCH_WORKERS: "${FETCH_WORKERS:-4}"
       TENDER_SOURCE_URL: "${TENDER_SOURCE_URL:-https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=}"
+      HENGQIN_API_URL: "${HENGQIN_API_URL:-https://www.hengqin.gov.cn/postmeta/i/22178.json}"
     volumes:
       - tender-data:/data
 volumes:

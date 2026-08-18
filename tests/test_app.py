@@ -1,5 +1,5 @@
 import unittest
-from app import GazetteParser, agency_category, clean_summary
+from app import GazetteParser, agency_category, clean_summary, normalize_hengqin_articles
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -24,6 +24,14 @@ class GazetteParserTests(unittest.TestCase):
         self.assertEqual(agency_category("市政署"), "行政法務範疇")
         self.assertEqual(agency_category("房屋局"), "運輸工務範疇")
         self.assertEqual(agency_category("未列出的歷史機構"), "其他")
+
+    def test_normalizes_hengqin_articles(self):
+        payload = {"articles": [{"id": 123, "title": "採購公告", "date": "2026-08-17",
+            "source": "橫琴部門", "url": "http://www.hengqin.gov.cn/example/123.html",
+            "visible_publish_time": 100}]}
+        item = normalize_hengqin_articles(payload)[0]
+        self.assertEqual(item["agency"], "橫琴部門")
+        self.assertEqual(item["detail_url"], "https://www.hengqin.gov.cn/example/123.html")
 
 
 if __name__ == "__main__":

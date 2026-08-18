@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parent
 DATA_DIR = Path(os.getenv("DATA_DIR", ROOT / "data"))
 DB_PATH = DATA_DIR / "tenders.db"
 SOURCE_URL = os.getenv("TENDER_SOURCE_URL", "https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=")
+HENGQIN_API_URL = os.getenv("HENGQIN_API_URL", "https://www.hengqin.gov.cn/postmeta/i/22178.json")
 REFRESH_SECONDS = max(1800, int(os.getenv("REFRESH_INTERVAL", "43200")))
 REFRESH_TOKEN = os.getenv("REFRESH_TOKEN", "")
 FETCH_WORKERS = min(8, max(1, int(os.getenv("FETCH_WORKERS", "4"))))
@@ -57,6 +58,10 @@ def connect():
         published_date TEXT NOT NULL, detail_url TEXT NOT NULL,
         bulletin_url TEXT NOT NULL, updated_at TEXT NOT NULL)""")
     db.execute("CREATE INDEX IF NOT EXISTS idx_bulletin_agency_date ON bulletin_tenders(agency,published_date DESC,id DESC)")
+    db.execute("""CREATE TABLE IF NOT EXISTS hengqin_tenders (
+        id TEXT PRIMARY KEY, agency TEXT NOT NULL, title TEXT NOT NULL,
+        published_date TEXT NOT NULL, detail_url TEXT NOT NULL,
+        updated_at TEXT NOT NULL)""")
     db.execute("CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY,value TEXT NOT NULL)")
     db.commit()
     return db
@@ -121,6 +126,29 @@ def fetch_page(page):
     return parser.rows, total_pages
 
 
+def normalize_hengqin_articles(payload):
+    articles = payload.get("articles", []) if isinstance(payload, dict) else []
+    rows = []
+    for item in articles:
+        item_id = str(item.get("id") or "").strip()
+        title = str(item.get("title") or "").strip()
+        published = str(item.get("date") or "").strip()
+        url = str(item.get("url") or "").strip().replace("http://www.hengqin.gov.cn/", "https://www.hengqin.gov.cn/", 1)
+        if item_id and title and re.fullmatch(r"20\d{2}-\d{2}-\d{2}", published) and url.startswith("https://"):
+            rows.append({"id": item_id, "agency": str(item.get("source") or "橫琴粵澳深度合作區").strip(),
+                "title": title, "published_date": published, "detail_url": url,
+                "sort_time": int(item.get("visible_publish_time") or item.get("publish_time") or 0)})
+    return sorted(rows, key=lambda row: (row["sort_time"], row["id"]), reverse=True)[:10]
+
+
+def fetch_hengqin():
+    request = Request(HENGQIN_API_URL, headers={"User-Agent": "macao-zhaobiaoV2/2.0 (+public-data-aggregator)", "Accept": "application/json"})
+    with urlopen(request, timeout=45) as response:
+        rows = normalize_hengqin_articles(json.load(response))
+    if len(rows) < 10: raise ValueError(f"横琴完整性检查失败：只取得 {len(rows)} 条记录")
+    return rows
+
+
 def refresh():
     if not refresh_lock.acquire(blocking=False): return {"ok": False, "message": "刷新任务正在进行中"}
     started = datetime.now(timezone.utc).isoformat()
@@ -130,16 +158,19 @@ def refresh():
             with ThreadPoolExecutor(max_workers=FETCH_WORKERS) as pool:
                 futures = {pool.submit(fetch_page, p): p for p in range(2, pages + 1)}
                 for future in as_completed(futures): all_rows.extend(future.result()[0])
-        unique = {row["id"]: row for row in all_rows}
+        unique = {row["id"]: row for row in all_rows}; hengqin_rows = fetch_hengqin()
         if len(unique) < 100: raise ValueError(f"完整性检查失败：只取得 {len(unique)} 条记录")
         db = connect(); previous = db.execute("SELECT count(*) FROM bulletin_tenders").fetchone()[0]
         db.execute("BEGIN IMMEDIATE"); db.execute("DELETE FROM bulletin_tenders")
         db.executemany("INSERT INTO bulletin_tenders VALUES (?,?,?,?,?,?,?)", [
             (r["id"],r["agency"],r["summary"],r["published_date"],r["detail_url"],r["bulletin_url"],started) for r in unique.values()])
+        db.execute("DELETE FROM hengqin_tenders")
+        db.executemany("INSERT INTO hengqin_tenders VALUES (?,?,?,?,?,?)", [
+            (r["id"],r["agency"],r["title"],r["published_date"],r["detail_url"],started) for r in hengqin_rows])
         for key,value in (("last_refresh",started),("last_error",""),("source_pages",str(pages))):
             db.execute("INSERT OR REPLACE INTO metadata VALUES (?,?)",(key,value))
         db.commit(); agencies=db.execute("SELECT count(DISTINCT agency) FROM bulletin_tenders").fetchone()[0]; db.close()
-        return {"ok":True,"count":len(unique),"agencies":agencies,"pages":pages,"new":max(0,len(unique)-previous),"at":started}
+        return {"ok":True,"count":len(unique),"agencies":agencies,"pages":pages,"hengqin":len(hengqin_rows),"new":max(0,len(unique)-previous),"at":started}
     except Exception as exc:
         db=connect(); db.execute("INSERT OR REPLACE INTO metadata VALUES ('last_error',?)",(str(exc),)); db.commit(); db.close()
         return {"ok":False,"message":str(exc),"at":started}
@@ -156,10 +187,11 @@ def dashboard(db):
         items=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders WHERE agency=? ORDER BY published_date DESC,id DESC LIMIT 5",(name,))]
         agencies.append({"name":name,"category":agency_category(name),"items":items})
     latest=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
+    hengqin_latest=[public(r) for r in db.execute("SELECT * FROM hengqin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
     meta=dict(db.execute("SELECT key,value FROM metadata"))
     category_order = list(CATEGORY_AGENCIES) + ["其他"]
     categories = [{"name": category, "count": sum(a["category"] == category for a in agencies)} for category in category_order]
-    return {"agencies":agencies,"categories":categories,"latest":latest,"agency_count":len(agencies),
+    return {"agencies":agencies,"categories":categories,"latest":latest,"hengqin_latest":hengqin_latest,"agency_count":len(agencies),
         "total":db.execute("SELECT count(*) FROM bulletin_tenders").fetchone()[0],
         "last_refresh":meta.get("last_refresh"),"last_error":meta.get("last_error"),"source_url":SOURCE_URL}
 
