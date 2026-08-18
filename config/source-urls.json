@@ -1,0 +1,435 @@
+{
+  "source": "https://github.com/musthesijie/macao-zhaobiao",
+  "count": 61,
+  "agencies": [
+    {
+      "id": "chief-1",
+      "category": "行政長官直屬機關",
+      "name": "新聞局",
+      "sourceUrl": "https://www.gcs.gov.mo/news/tender/zh-hant",
+      "buttonUrl": "https://www.gcs.gov.mo/news/tender/zh-hant"
+    },
+    {
+      "id": "chief-2",
+      "category": "行政長官直屬機關",
+      "name": "個人資料保護局",
+      "sourceUrl": "https://www.dspdp.gov.mo/zh_tw/purchasing_information.html",
+      "buttonUrl": "https://www.dspdp.gov.mo/zh_tw/purchasing_information.html"
+    },
+    {
+      "id": "chief-3",
+      "category": "行政長官直屬機關",
+      "name": "公共資產監督管理局",
+      "sourceUrl": "https://www.dsgap.gov.mo/tender",
+      "buttonUrl": "https://www.dsgap.gov.mo/tender"
+    },
+    {
+      "id": "chief-4",
+      "category": "行政長官直屬機關",
+      "name": "澳門駐里斯本經濟貿易辦事處",
+      "sourceUrl": "https://www-zh.decmacau.pt/informacao-relativa-as-aquisicoes/",
+      "buttonUrl": "https://www-zh.decmacau.pt/informacao-relativa-as-aquisicoes/"
+    },
+    {
+      "id": "chief-5",
+      "category": "行政長官直屬機關",
+      "name": "澳門駐布魯塞爾歐盟經濟貿易辦事處",
+      "sourceUrl": "https://www.macao-eu.be/about_office/aquisicoes?l=cn",
+      "buttonUrl": "https://www.macao-eu.be/about_office/aquisicoes?l=cn"
+    },
+    {
+      "id": "chief-6",
+      "category": "行政長官直屬機關",
+      "name": "澳門駐世界貿易組織經濟貿易辦事處",
+      "sourceUrl": "https://www.macaoeto.ch/cn/acquisitions.php",
+      "buttonUrl": "https://www.macaoeto.ch/cn/acquisitions.php"
+    },
+    {
+      "id": "chief-7",
+      "category": "行政長官直屬機關",
+      "name": "澳門基金會",
+      "sourceUrl": "https://www.fmac.org.mo/suppliers/public_tenders",
+      "buttonUrl": "https://www.fmac.org.mo/suppliers/public_tenders"
+    },
+    {
+      "id": "chief-8",
+      "category": "行政長官直屬機關",
+      "name": "政策研究和區域發展局",
+      "sourceUrl": "https://www.dsepdr.gov.mo/zh-hant/purchase-order",
+      "buttonUrl": "https://www.dsepdr.gov.mo/zh-hant/purchase-order"
+    },
+    {
+      "id": "administration-1",
+      "category": "行政法務範疇",
+      "name": "身份證明局",
+      "sourceUrl": "https://www.dsi.gov.mo/zh-hant/tender",
+      "buttonUrl": "https://www.dsi.gov.mo/zh-hant/tender"
+    },
+    {
+      "id": "administration-2",
+      "category": "行政法務範疇",
+      "name": "行政公職局",
+      "sourceUrl": "https://www.safp.gov.mo/zh-hant/news/tender",
+      "buttonUrl": "https://www.safp.gov.mo/zh-hant/news/tender"
+    },
+    {
+      "id": "administration-3",
+      "category": "行政法務範疇",
+      "name": "法務局",
+      "sourceUrl": "https://www.dsaj.gov.mo/general/tenderInfo_tc.aspx",
+      "buttonUrl": "https://www.dsaj.gov.mo/general/tenderInfo_tc.aspx"
+    },
+    {
+      "id": "administration-4",
+      "category": "行政法務範疇",
+      "name": "市政署",
+      "sourceUrl": "https://www.iam.gov.mo/c/tender/itemlist",
+      "buttonUrl": "https://www.iam.gov.mo/c/tender/itemlist"
+    },
+    {
+      "id": "administration-5",
+      "category": "行政法務範疇",
+      "name": "退休基金會",
+      "sourceUrl": "https://www.fp.gov.mo/public/cp_fp_tender.aspx",
+      "buttonUrl": "https://www.fp.gov.mo/public/cp_fp_tender.aspx"
+    },
+    {
+      "id": "economy-1",
+      "category": "經濟財政範疇",
+      "name": "經濟財政司司長辦公室",
+      "sourceUrl": "https://www.gsef.gov.mo/purchases?locale=zh",
+      "buttonUrl": "https://www.gsef.gov.mo/purchases?locale=zh"
+    },
+    {
+      "id": "economy-2",
+      "category": "經濟財政範疇",
+      "name": "財政局",
+      "sourceUrl": "https://www.dsf.gov.mo/about/tenderInfo",
+      "buttonUrl": "https://www.dsf.gov.mo/about/tenderInfo"
+    },
+    {
+      "id": "economy-3",
+      "category": "經濟財政範疇",
+      "name": "統計暨普查局",
+      "sourceUrl": "https://www.dsec.gov.mo/zh-MO/About/Information",
+      "buttonUrl": "https://www.dsec.gov.mo/zh-MO/About/Information"
+    },
+    {
+      "id": "economy-4",
+      "category": "經濟財政範疇",
+      "name": "博彩監察協調局",
+      "sourceUrl": "https://www.dicj.gov.mo/web/cn/purchase/index.html",
+      "buttonUrl": "https://www.dicj.gov.mo/web/cn/purchase/index.html"
+    },
+    {
+      "id": "economy-5",
+      "category": "經濟財政範疇",
+      "name": "勞工事務局",
+      "sourceUrl": "https://www.dsal.gov.mo/zh_tw/standard/concurso_publico_c.html",
+      "buttonUrl": "https://www.dsal.gov.mo/zh_tw/standard/concurso_publico_c.html"
+    },
+    {
+      "id": "economy-6",
+      "category": "經濟財政範疇",
+      "name": "經濟及科技發展局",
+      "sourceUrl": "https://www.dsedt.gov.mo/zh_MO/web/public/pg_tender",
+      "buttonUrl": "https://www.dsedt.gov.mo/zh_MO/web/public/pg_tender"
+    },
+    {
+      "id": "economy-7",
+      "category": "經濟財政範疇",
+      "name": "旅遊局",
+      "sourceUrl": "https://www.dst.gov.mo/zh-hant/about-us/procurement-information.html",
+      "buttonUrl": "https://www.dst.gov.mo/zh-hant/about-us/procurement-information.html"
+    },
+    {
+      "id": "economy-8",
+      "category": "經濟財政範疇",
+      "name": "招商投資促進局",
+      "sourceUrl": "https://www.ipim.gov.mo/zh-hant/about-ipim/procurement-information/",
+      "buttonUrl": "https://www.ipim.gov.mo/zh-hant/about-ipim/procurement-information/"
+    },
+    {
+      "id": "economy-9",
+      "category": "經濟財政範疇",
+      "name": "消費者委員會",
+      "sourceUrl": "https://www.consumer.gov.mo/AboutUS/procurement.aspx?lang=zh",
+      "buttonUrl": "https://www.consumer.gov.mo/AboutUS/procurement.aspx?lang=zh"
+    },
+    {
+      "id": "economy-10",
+      "category": "經濟財政範疇",
+      "name": "工商業發展基金",
+      "sourceUrl": "https://www.ipim.gov.mo/zh-hant/about-ipim/procurement-information/public-tender",
+      "buttonUrl": "https://www.ipim.gov.mo/zh-hant/about-ipim/procurement-information/public-tender"
+    },
+    {
+      "id": "economy-11",
+      "category": "經濟財政範疇",
+      "name": "旅遊基金",
+      "sourceUrl": "https://www.dst.gov.mo/zh-hant/about-us/procurement-information.html",
+      "buttonUrl": "https://www.dst.gov.mo/zh-hant/about-us/procurement-information.html"
+    },
+    {
+      "id": "economy-12",
+      "category": "經濟財政範疇",
+      "name": "澳門金融管理局",
+      "sourceUrl": "https://www.amcm.gov.mo/zh-hant/about-amcm/tenderinfo?type=tenderinfo-cat-1",
+      "buttonUrl": "https://www.amcm.gov.mo/zh-hant/about-amcm/tenderinfo?type=tenderinfo-cat-1"
+    },
+    {
+      "id": "economy-13",
+      "category": "經濟財政範疇",
+      "name": "勞動債權保障基金",
+      "sourceUrl": "https://www.fgcl.gov.mo/ch/concurso_publico.html",
+      "buttonUrl": "https://www.fgcl.gov.mo/ch/concurso_publico.html"
+    },
+    {
+      "id": "security-1",
+      "category": "保安範疇",
+      "name": "保安司司長辦公室",
+      "sourceUrl": "https://www.gss.gov.mo/cht/tender.aspx",
+      "buttonUrl": "https://www.gss.gov.mo/cht/tender.aspx"
+    },
+    {
+      "id": "security-2",
+      "category": "保安範疇",
+      "name": "司法警察局",
+      "sourceUrl": "https://www.pj.gov.mo/Web/Policia/purchaseInfo/",
+      "buttonUrl": "https://www.pj.gov.mo/Web/Policia/purchaseInfo/"
+    },
+    {
+      "id": "security-3",
+      "category": "保安範疇",
+      "name": "警察總局",
+      "sourceUrl": "https://www.spu.gov.mo/index.php?a=lists&c=index&catid=171&lang=tw&m=content",
+      "buttonUrl": "https://www.spu.gov.mo/index.php?a=lists&c=index&catid=171&lang=tw&m=content"
+    },
+    {
+      "id": "security-4",
+      "category": "保安範疇",
+      "name": "澳門保安部隊事務局",
+      "sourceUrl": "https://www.fsm.gov.mo/dsfsm/cht/tender/tender.aspx",
+      "buttonUrl": "https://www.fsm.gov.mo/dsfsm/cht/tender/tender.aspx"
+    },
+    {
+      "id": "security-5",
+      "category": "保安範疇",
+      "name": "澳門特別行政區海關",
+      "sourceUrl": "https://www.customs.gov.mo/cn/tenderinfo.html",
+      "buttonUrl": "https://www.customs.gov.mo/cn/tenderinfo.html"
+    },
+    {
+      "id": "security-6",
+      "category": "保安範疇",
+      "name": "海關福利會",
+      "sourceUrl": "https://www.customs.gov.mo/cn/tenderinfo.html",
+      "buttonUrl": "https://www.customs.gov.mo/cn/tenderinfo.html"
+    },
+    {
+      "id": "security-7",
+      "category": "保安範疇",
+      "name": "懲教管理局",
+      "sourceUrl": "https://www.dsc.gov.mo/site/procure.aspx",
+      "buttonUrl": "https://www.dsc.gov.mo/site/procure.aspx"
+    },
+    {
+      "id": "social-1",
+      "category": "社會文化範疇",
+      "name": "文化局",
+      "sourceUrl": "https://www.icm.gov.mo/cn/announcement2",
+      "buttonUrl": "https://www.icm.gov.mo/cn/announcement2"
+    },
+    {
+      "id": "social-2",
+      "category": "社會文化範疇",
+      "name": "體育局",
+      "sourceUrl": "https://www.sport.gov.mo/zh/bid?cat=bid_cat_open",
+      "buttonUrl": "https://www.sport.gov.mo/zh/bid?cat=bid_cat_open"
+    },
+    {
+      "id": "social-3",
+      "category": "社會文化範疇",
+      "name": "教育及青年發展局",
+      "sourceUrl": "https://portal.dsedj.gov.mo/webdsejspace/internet/Inter_main_page.jsp?id=61225",
+      "buttonUrl": "https://portal.dsedj.gov.mo/webdsejspace/internet/Inter_main_page.jsp?id=61225"
+    },
+    {
+      "id": "social-4",
+      "category": "社會文化範疇",
+      "name": "衛生局",
+      "sourceUrl": "https://ssm.gov.mo/PurchasingInfoPublish/PConsulta",
+      "buttonUrl": "https://ssm.gov.mo/PurchasingInfoPublish/PConsulta"
+    },
+    {
+      "id": "social-5",
+      "category": "社會文化範疇",
+      "name": "社會工作局",
+      "sourceUrl": "https://www.ias.gov.mo/zh/purchasing_information/open_tender1861",
+      "buttonUrl": "https://www.ias.gov.mo/zh/purchasing_information/open_tender1861"
+    },
+    {
+      "id": "social-6",
+      "category": "社會文化範疇",
+      "name": "澳門理工大學",
+      "sourceUrl": "https://www.mpu.edu.mo/zh-hant/tenders",
+      "buttonUrl": "https://www.mpu.edu.mo/zh-hant/tenders"
+    },
+    {
+      "id": "social-7",
+      "category": "社會文化範疇",
+      "name": "澳門大學",
+      "sourceUrl": "https://pct.admo.um.edu.mo/for-suppliers/tender-notice/",
+      "buttonUrl": "https://pct.admo.um.edu.mo/for-suppliers/tender-notice/"
+    },
+    {
+      "id": "social-8",
+      "category": "社會文化範疇",
+      "name": "澳門旅遊大學",
+      "sourceUrl": "https://www.utm.edu.mo/zh-cht/partners/public-tender",
+      "buttonUrl": "https://www.utm.edu.mo/zh-cht/partners/public-tender"
+    },
+    {
+      "id": "social-9",
+      "category": "社會文化範疇",
+      "name": "文化發展基金",
+      "sourceUrl": "https://www.fdc.gov.mo/zh-hant/public_information/procurement",
+      "buttonUrl": "https://www.fdc.gov.mo/zh-hant/public_information/procurement"
+    },
+    {
+      "id": "social-10",
+      "category": "社會文化範疇",
+      "name": "社會保障基金",
+      "sourceUrl": "https://www.fss.gov.mo/zh-hant/aboutus/purchaseinfo",
+      "buttonUrl": "https://www.fss.gov.mo/zh-hant/aboutus/purchaseinfo"
+    },
+    {
+      "id": "social-11",
+      "category": "社會文化範疇",
+      "name": "藥物監督管理局",
+      "sourceUrl": "https://www.isaf.gov.mo/news/procurement",
+      "buttonUrl": "https://www.isaf.gov.mo/news/procurement"
+    },
+    {
+      "id": "transport-1",
+      "category": "運輸工務範疇",
+      "name": "地圖繪製暨地籍局",
+      "sourceUrl": "https://www.dsscu.gov.mo/zh/publicinfo/bidding-1/openbidding-1",
+      "buttonUrl": "https://www.dsscu.gov.mo/zh/publicinfo/bidding-1/openbidding-1"
+    },
+    {
+      "id": "transport-2",
+      "category": "運輸工務範疇",
+      "name": "地球物理氣象局",
+      "sourceUrl": "https://www.smg.gov.mo/zh/subpage/473/page/298",
+      "buttonUrl": "https://www.smg.gov.mo/zh/subpage/473/page/298"
+    },
+    {
+      "id": "transport-3",
+      "category": "運輸工務範疇",
+      "name": "交通事務局",
+      "sourceUrl": "https://www.dsat.gov.mo/dsat/tender.aspx?a_type=1",
+      "buttonUrl": "https://www.dsat.gov.mo/dsat/tender.aspx?a_type=1"
+    },
+    {
+      "id": "transport-4",
+      "category": "運輸工務範疇",
+      "name": "環境保護局",
+      "sourceUrl": "https://www.dspa.gov.mo/tender1.aspx",
+      "buttonUrl": "https://www.dspa.gov.mo/tender1.aspx"
+    },
+    {
+      "id": "transport-5",
+      "category": "運輸工務範疇",
+      "name": "土地工務局",
+      "sourceUrl": "https://www.dsscu.gov.mo/zh/publicinfo/bidding-1/openbidding-1",
+      "buttonUrl": "https://www.dsscu.gov.mo/zh/publicinfo/bidding-1/openbidding-1"
+    },
+    {
+      "id": "transport-6",
+      "category": "運輸工務範疇",
+      "name": "公共建設局",
+      "sourceUrl": "https://www.dsop.gov.mo/tender/",
+      "buttonUrl": "https://www.dsop.gov.mo/tender/"
+    },
+    {
+      "id": "transport-7",
+      "category": "運輸工務範疇",
+      "name": "海事及水務局",
+      "sourceUrl": "https://www.marine.gov.mo/tender.aspx?data_category=1",
+      "buttonUrl": "https://www.marine.gov.mo/tender.aspx?data_category=1"
+    },
+    {
+      "id": "transport-8",
+      "category": "運輸工務範疇",
+      "name": "房屋局",
+      "sourceUrl": "https://www.ihm.gov.mo/zh/node-700?id=142&cid=145",
+      "buttonUrl": "https://www.ihm.gov.mo/zh/node-700?id=142&cid=145"
+    },
+    {
+      "id": "transport-9",
+      "category": "運輸工務範疇",
+      "name": "民航局",
+      "sourceUrl": "https://www.aacm.gov.mo/zh-hant/about/tender/public-bidding",
+      "buttonUrl": "https://www.aacm.gov.mo/zh-hant/about/tender/public-bidding"
+    },
+    {
+      "id": "transport-10",
+      "category": "運輸工務範疇",
+      "name": "樓宇維修基金",
+      "sourceUrl": "https://www.ihm.gov.mo/zh/node-700",
+      "buttonUrl": "https://www.ihm.gov.mo/zh/node-700",
+      "needsReview": true
+    },
+    {
+      "id": "transport-11",
+      "category": "運輸工務範疇",
+      "name": "環保與節能基金",
+      "sourceUrl": "https://www.fpace.gov.mo/fpace_tc/tender.aspx",
+      "buttonUrl": "https://www.fpace.gov.mo/fpace_tc/tender.aspx"
+    },
+    {
+      "id": "transport-12",
+      "category": "運輸工務範疇",
+      "name": "郵電局",
+      "sourceUrl": "https://www.ctt.gov.mo/zh-TW/Contents/tenders",
+      "buttonUrl": "https://www.ctt.gov.mo/zh-TW/Contents/tenders"
+    },
+    {
+      "id": "transport-13",
+      "category": "運輸工務範疇",
+      "name": "郵政儲金局",
+      "sourceUrl": "https://www.ctt.gov.mo/zh-TW/Contents/tenders",
+      "buttonUrl": "https://www.ctt.gov.mo/zh-TW/Contents/tenders"
+    },
+    {
+      "id": "legislature-1",
+      "category": "立法司法範疇",
+      "name": "檢察長辦公室",
+      "sourceUrl": "https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13",
+      "buttonUrl": "https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13"
+    },
+    {
+      "id": "legislature-2",
+      "category": "立法司法範疇",
+      "name": "終審法院院長辦公室",
+      "sourceUrl": "https://www.court.gov.mo/zh/subpage/tender",
+      "buttonUrl": "https://www.court.gov.mo/zh/subpage/tender"
+    },
+    {
+      "id": "integrity-1",
+      "category": "廉政審計範疇",
+      "name": "審計署",
+      "sourceUrl": "https://www.ca.gov.mo/",
+      "buttonUrl": "https://www.ca.gov.mo/",
+      "needsReview": true
+    },
+    {
+      "id": "integrity-2",
+      "category": "廉政審計範疇",
+      "name": "廉政公署",
+      "sourceUrl": "https://www.ccac.org.mo/tc/public_tender.html",
+      "buttonUrl": "https://www.ccac.org.mo/tc/public_tender.html"
+    }
+  ]
+}
