@@ -33,7 +33,7 @@ HENGQIN_API_URL=https://www.hengqin.gov.cn/postmeta/i/22178.json
 
 * `GET /api/dashboard`：全部机构、每机构最新五则及全站最新十则
 * `GET /api/tenders?agency=&q=`：按机构或关键词检索公报事项
-* `POST /api/refresh`：立即遍历并刷新公报事项分类
+* `POST /api/refresh`：立即刷新澳门公报事项及横琴最新采购招标
 * `GET /healthz`：容器健康检查
 
 ## 本地运行
