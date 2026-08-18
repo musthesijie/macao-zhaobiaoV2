@@ -6,6 +6,8 @@ V2 沿用原版 [`macao-zhaobiao`](https://github.com/musthesijie/macao-zhaobiao
 
 机构分类以澳门政府入口网站的[公共部门及其他机构](https://www.gov.mo/zh-hant/about-government/departments-and-agencies/)目录为准；公报中没有列入该目录的历史机构或其他实体统一归入“其他”。列表会自动移除“公告一则／通告一则”等公文套语。
 
+右上角“资料来源”目录及机构卡片的采购网址取自原版 `macao-zhaobiao` 的已核对来源清单，并保存在 `config/source-urls.json`，方便部署时稳定读取和后续维护。
+
 ## Docker 一键部署
 
 ```bash

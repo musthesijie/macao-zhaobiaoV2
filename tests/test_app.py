@@ -1,5 +1,5 @@
 import unittest
-from app import GazetteParser, agency_category, clean_summary
+from app import GazetteParser, agency_category, agency_source, clean_summary, source_directory
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -24,6 +24,15 @@ class GazetteParserTests(unittest.TestCase):
         self.assertEqual(agency_category("市政署"), "行政法務範疇")
         self.assertEqual(agency_category("房屋局"), "運輸工務範疇")
         self.assertEqual(agency_category("未列出的歷史機構"), "其他")
+
+    def test_source_directory_comes_from_original_dashboard(self):
+        directory = source_directory()
+        self.assertEqual(directory["count"], 61)
+        self.assertEqual(directory["source"], "https://github.com/musthesijie/macao-zhaobiao")
+        self.assertEqual({item["name"] for item in directory["agencies"] if item.get("needsReview")}, {"樓宇維修基金", "審計署"})
+        self.assertEqual(agency_source("新聞局"), "https://www.gcs.gov.mo/news/tender/zh-hant")
+        self.assertEqual(agency_source("市政署"), "https://www.iam.gov.mo/c/tender/itemlist")
+        self.assertEqual(agency_source("未列出的歷史機構"), "https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=")
 
 
 if __name__ == "__main__":
