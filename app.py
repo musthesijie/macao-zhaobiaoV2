@@ -5,7 +5,6 @@ import os
 import re
 import sqlite3
 import threading
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -196,8 +195,22 @@ def dashboard(db):
         "last_refresh":meta.get("last_refresh"),"last_error":meta.get("last_error"),"source_url":SOURCE_URL}
 
 
-def scheduler():
-    while True: refresh(); time.sleep(REFRESH_SECONDS)
+def scheduler(interval=REFRESH_SECONDS, stop_event=None, refresh_fn=refresh):
+    """Refresh immediately and then repeatedly at the configured interval.
+
+    Event.wait makes the loop straightforward to stop in tests and during a
+    graceful shutdown.  Keeping the exception guard here ensures that an
+    unexpected collector error cannot silently kill all future scheduled runs.
+    """
+    stop_event = stop_event or threading.Event()
+    while not stop_event.is_set():
+        try:
+            refresh_fn()
+        except Exception as exc:
+            # refresh() normally records its own errors, but retain the
+            # scheduler even if an unforeseen exception escapes it.
+            print(f"Scheduled refresh failed: {exc}", flush=True)
+        stop_event.wait(interval)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -230,5 +243,5 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__=="__main__":
-    connect().close(); threading.Thread(target=scheduler,daemon=True).start(); port=int(os.getenv("PORT","8080"))
+    connect().close(); threading.Thread(target=scheduler,name="tender-refresh",daemon=True).start(); port=int(os.getenv("PORT","8080"))
     print(f"澳门招标 V2 listening on 0.0.0.0:{port}"); ThreadingHTTPServer(("0.0.0.0",port),Handler).serve_forever()

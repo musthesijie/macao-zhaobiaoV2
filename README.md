@@ -14,7 +14,7 @@ V2 沿用原版 [`macao-zhaobiao`](https://github.com/musthesijie/macao-zhaobiao
 docker compose up -d --build
 ```
 
-打开 `http://服务器地址:8080`。SQLite 数据保存在 Docker 卷 `tender-data`，重建容器不会丢失。服务启动时立即同步，之后默认每 12 小时同步一次。
+打开 `http://服务器地址:8080`。SQLite 数据保存在 Docker 卷 `tender-data`，重建容器不会丢失。服务启动时会立即同步一次，之后由容器内的后台调度器每 12 小时（43,200 秒）自动抓取澳门公报及横琴招标资讯；单次抓取即使遇到临时异常，调度器也会继续等待并执行下一轮任务。
 
 可在项目目录创建 `.env`：
 
@@ -26,6 +26,8 @@ FETCH_WORKERS=4
 TENDER_SOURCE_URL=https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=
 HENGQIN_API_URL=https://www.hengqin.gov.cn/postmeta/i/22178.json
 ```
+
+`REFRESH_INTERVAL` 的单位为秒；保留默认值 `43200` 即为每 12 小时刷新。修改 `.env` 后需执行 `docker compose up -d --build` 让配置生效。可通过看板上的“最后更新”时间或 `GET /api/dashboard` 返回的 `last_refresh` 字段确认自动抓取是否成功。
 
 设置 `REFRESH_TOKEN` 后，手动刷新接口需提供 `Authorization: Bearer <令牌>`；同时网页上的公开刷新按钮将无法使用，适合生产环境。定时刷新不受影响。
 
