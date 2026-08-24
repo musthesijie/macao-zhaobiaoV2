@@ -1,5 +1,7 @@
 import unittest
-from app import GazetteParser, agency_category, clean_summary, normalize_hengqin_articles
+import threading
+
+from app import REFRESH_SECONDS, GazetteParser, agency_category, clean_summary, normalize_hengqin_articles, scheduler
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -32,6 +34,24 @@ class GazetteParserTests(unittest.TestCase):
         item = normalize_hengqin_articles(payload)[0]
         self.assertEqual(item["agency"], "橫琴部門")
         self.assertEqual(item["detail_url"], "https://www.hengqin.gov.cn/example/123.html")
+
+
+class SchedulerTests(unittest.TestCase):
+    def test_default_refresh_interval_is_twelve_hours(self):
+        self.assertEqual(REFRESH_SECONDS, 12 * 60 * 60)
+
+    def test_scheduler_keeps_running_after_a_failed_refresh(self):
+        stopped = threading.Event()
+        calls = []
+
+        def refresh_once():
+            calls.append(len(calls))
+            if len(calls) == 1:
+                raise RuntimeError("temporary source failure")
+            stopped.set()
+
+        scheduler(interval=0.001, stop_event=stopped, refresh_fn=refresh_once)
+        self.assertEqual(calls, [0, 1])
 
 
 if __name__ == "__main__":
