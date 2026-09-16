@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from html.parser import HTMLParser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urljoin, urlparse
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent
@@ -18,6 +18,8 @@ DATA_DIR = Path(os.getenv("DATA_DIR", ROOT / "data"))
 DB_PATH = DATA_DIR / "tenders.db"
 SOURCE_URL = os.getenv("TENDER_SOURCE_URL", "https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=")
 HENGQIN_API_URL = os.getenv("HENGQIN_API_URL", "https://www.hengqin.gov.cn/postmeta/i/22178.json")
+PCP_API_URL = os.getenv("PCP_API_URL", "https://www.pcp.gov.mo/gpcms/web/front/v2/info/selectInfoMoreChannel")
+PCP_SITE_URL = "https://www.pcp.gov.mo/gpcms-center-web/#/infoDetail"
 REFRESH_SECONDS = max(1800, int(os.getenv("REFRESH_INTERVAL", "43200")))
 REFRESH_TOKEN = os.getenv("REFRESH_TOKEN", "")
 FETCH_WORKERS = min(8, max(1, int(os.getenv("FETCH_WORKERS", "4"))))
@@ -59,6 +61,10 @@ def connect():
     db.execute("CREATE INDEX IF NOT EXISTS idx_bulletin_agency_date ON bulletin_tenders(agency,published_date DESC,id DESC)")
     db.execute("""CREATE TABLE IF NOT EXISTS hengqin_tenders (
         id TEXT PRIMARY KEY, agency TEXT NOT NULL, title TEXT NOT NULL,
+        published_date TEXT NOT NULL, detail_url TEXT NOT NULL,
+        updated_at TEXT NOT NULL)""")
+    db.execute("""CREATE TABLE IF NOT EXISTS pcp_tenders (
+        id TEXT PRIMARY KEY, agency TEXT NOT NULL, summary TEXT NOT NULL,
         published_date TEXT NOT NULL, detail_url TEXT NOT NULL,
         updated_at TEXT NOT NULL)""")
     db.execute("CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY,value TEXT NOT NULL)")
@@ -137,15 +143,46 @@ def normalize_hengqin_articles(payload):
             rows.append({"id": item_id, "agency": str(item.get("source") or "橫琴粵澳深度合作區").strip(),
                 "title": title, "published_date": published, "detail_url": url,
                 "sort_time": int(item.get("visible_publish_time") or item.get("publish_time") or 0)})
-    return sorted(rows, key=lambda row: (row["sort_time"], row["id"]), reverse=True)[:10]
+    return sorted(rows, key=lambda row: (row["sort_time"], row["id"]), reverse=True)[:20]
 
 
 def fetch_hengqin():
     request = Request(HENGQIN_API_URL, headers={"User-Agent": "macao-zhaobiaoV2/2.0 (+public-data-aggregator)", "Accept": "application/json"})
     with urlopen(request, timeout=45) as response:
         rows = normalize_hengqin_articles(json.load(response))
-    if len(rows) < 10: raise ValueError(f"横琴完整性检查失败：只取得 {len(rows)} 条记录")
+    if len(rows) < 20: raise ValueError(f"横琴完整性检查失败：只取得 {len(rows)} 条记录")
     return rows
+
+
+def normalize_pcp_tenders(payload):
+    """Convert Public Procurement Platform API records to local tender rows."""
+    data = payload.get("data") if isinstance(payload, dict) else None
+    items = data.get("rows", []) if isinstance(data, dict) else []
+    rows = []
+    for item in items:
+        item_id = str(item.get("id") or "").strip()
+        title = str(item.get("title") or item.get("projectName") or "").strip()
+        agency = str(item.get("publishDepartment") or "公共採購平台").strip()
+        date_match = re.match(r"(20\d{2}-\d{2}-\d{2})", str(item.get("noticeTime") or ""))
+        if not (item_id and title and date_match):
+            continue
+        query = urlencode({"id": item_id, "publishNumber": item.get("publishNumber") or "",
+            "cgType": item.get("cgType") or "", "parentPath": ""})
+        rows.append({"id": item_id, "agency": agency, "summary": title,
+            "published_date": date_match.group(1), "detail_url": f"{PCP_SITE_URL}?{query}"})
+    return rows
+
+
+def fetch_pcp():
+    params = urlencode({"siteId": "94c965cc-c55d-4f92-8469-d5875c68bd04",
+        "channel": "3ca455ef3f421810f1e36a46ed220b61", "pageNumber": 1, "pageSize": 20})
+    request = Request(f"{PCP_API_URL}?{params}", headers={
+        "User-Agent": "macao-zhaobiaoV2/2.0 (+public-data-aggregator)", "Accept": "application/json"})
+    with urlopen(request, timeout=45) as response:
+        payload = json.load(response)
+    if str(payload.get("code")) != "200":
+        raise ValueError(f"公共採購平台接口異常：{payload.get('msg') or '未知錯誤'}")
+    return normalize_pcp_tenders(payload)
 
 
 def refresh():
@@ -157,7 +194,7 @@ def refresh():
             with ThreadPoolExecutor(max_workers=FETCH_WORKERS) as pool:
                 futures = {pool.submit(fetch_page, p): p for p in range(2, pages + 1)}
                 for future in as_completed(futures): all_rows.extend(future.result()[0])
-        unique = {row["id"]: row for row in all_rows}; hengqin_rows = fetch_hengqin()
+        unique = {row["id"]: row for row in all_rows}; hengqin_rows = fetch_hengqin(); pcp_rows = fetch_pcp()
         if len(unique) < 100: raise ValueError(f"完整性检查失败：只取得 {len(unique)} 条记录")
         db = connect(); previous = db.execute("SELECT count(*) FROM bulletin_tenders").fetchone()[0]
         db.execute("BEGIN IMMEDIATE"); db.execute("DELETE FROM bulletin_tenders")
@@ -166,10 +203,14 @@ def refresh():
         db.execute("DELETE FROM hengqin_tenders")
         db.executemany("INSERT INTO hengqin_tenders VALUES (?,?,?,?,?,?)", [
             (r["id"],r["agency"],r["title"],r["published_date"],r["detail_url"],started) for r in hengqin_rows])
+        db.execute("DELETE FROM pcp_tenders")
+        db.executemany("INSERT INTO pcp_tenders VALUES (?,?,?,?,?,?)", [
+            (r["id"],r["agency"],r["summary"],r["published_date"],r["detail_url"],started) for r in pcp_rows])
         for key,value in (("last_refresh",started),("last_error",""),("source_pages",str(pages))):
             db.execute("INSERT OR REPLACE INTO metadata VALUES (?,?)",(key,value))
         db.commit(); agencies=db.execute("SELECT count(DISTINCT agency) FROM bulletin_tenders").fetchone()[0]; db.close()
-        return {"ok":True,"count":len(unique),"agencies":agencies,"pages":pages,"hengqin":len(hengqin_rows),"new":max(0,len(unique)-previous),"at":started}
+        return {"ok":True,"count":len(unique),"agencies":agencies,"pages":pages,"hengqin":len(hengqin_rows),
+            "pcp":len(pcp_rows),"new":max(0,len(unique)-previous),"at":started}
     except Exception as exc:
         db=connect(); db.execute("INSERT OR REPLACE INTO metadata VALUES ('last_error',?)",(str(exc),)); db.commit(); db.close()
         return {"ok":False,"message":str(exc),"at":started}
@@ -185,8 +226,12 @@ def dashboard(db):
     for name in names:
         items=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders WHERE agency=? ORDER BY published_date DESC,id DESC LIMIT 5",(name,))]
         agencies.append({"name":name,"category":agency_category(name),"items":items})
-    latest=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
-    hengqin_latest=[public(r) for r in db.execute("SELECT * FROM hengqin_tenders ORDER BY published_date DESC,id DESC LIMIT 10")]
+    latest=[public(r) for r in db.execute("""SELECT id,agency,summary,published_date,detail_url,source FROM (
+        SELECT id,agency,summary,published_date,detail_url,'公報原文' AS source FROM bulletin_tenders
+        UNION ALL
+        SELECT id,agency,summary,published_date,detail_url,'採購平台' AS source FROM pcp_tenders
+        ) ORDER BY published_date DESC,id DESC LIMIT 20""")]
+    hengqin_latest=[public(r) for r in db.execute("SELECT * FROM hengqin_tenders ORDER BY published_date DESC,id DESC LIMIT 20")]
     meta=dict(db.execute("SELECT key,value FROM metadata"))
     category_order = list(CATEGORY_AGENCIES) + ["其他"]
     categories = [{"name": category, "count": sum(a["category"] == category for a in agencies)} for category in category_order]

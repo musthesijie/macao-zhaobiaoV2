@@ -1,7 +1,8 @@
 import unittest
 import threading
 
-from app import REFRESH_SECONDS, GazetteParser, agency_category, clean_summary, normalize_hengqin_articles, scheduler
+from app import (REFRESH_SECONDS, GazetteParser, agency_category, clean_summary,
+    normalize_hengqin_articles, normalize_pcp_tenders, scheduler)
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -34,6 +35,22 @@ class GazetteParserTests(unittest.TestCase):
         item = normalize_hengqin_articles(payload)[0]
         self.assertEqual(item["agency"], "橫琴部門")
         self.assertEqual(item["detail_url"], "https://www.hengqin.gov.cn/example/123.html")
+
+    def test_hengqin_latest_keeps_twenty_articles(self):
+        payload = {"articles": [{"id": i, "title": f"採購公告 {i}", "date": "2026-08-17",
+            "url": f"https://www.hengqin.gov.cn/example/{i}.html", "publish_time": i} for i in range(25)]}
+        self.assertEqual(len(normalize_hengqin_articles(payload)), 20)
+        self.assertEqual(normalize_hengqin_articles(payload)[0]["id"], "24")
+
+    def test_normalizes_public_procurement_platform_tenders(self):
+        payload = {"code": "200", "data": {"rows": [{"id": "notice-1", "title": "供應NAS網絡存儲硬盤",
+            "noticeTime": "2026-09-15 12:09:55", "publishDepartment": "協和澳門醫學中心",
+            "publishNumber": "6012/PP/2026", "cgType": "4"}]}}
+        item = normalize_pcp_tenders(payload)[0]
+        self.assertEqual(item["agency"], "協和澳門醫學中心")
+        self.assertEqual(item["published_date"], "2026-09-15")
+        self.assertIn("id=notice-1", item["detail_url"])
+        self.assertIn("publishNumber=6012%2FPP%2F2026", item["detail_url"])
 
 
 class SchedulerTests(unittest.TestCase):
