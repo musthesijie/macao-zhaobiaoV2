@@ -1,8 +1,12 @@
 import unittest
 import threading
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
 
 from app import (REFRESH_SECONDS, GazetteParser, agency_category, clean_summary,
-    normalize_hengqin_articles, normalize_pcp_tenders, scheduler)
+    connect, ledger, ledger_session_token, month_index, normalize_hengqin_articles,
+    normalize_pcp_tenders, scheduler, valid_month)
 
 
 class GazetteParserTests(unittest.TestCase):
@@ -69,6 +73,36 @@ class SchedulerTests(unittest.TestCase):
 
         scheduler(interval=0.001, stop_event=stopped, refresh_fn=refresh_once)
         self.assertEqual(calls, [0, 1])
+
+
+class LedgerTests(unittest.TestCase):
+    def test_validates_month_and_creates_stable_opaque_session(self):
+        self.assertTrue(valid_month("2026-09"))
+        self.assertFalse(valid_month("2026-13"))
+        self.assertFalse(valid_month("September"))
+        self.assertLess(month_index("2026-12"), month_index("2027-01"))
+        self.assertEqual(ledger_session_token(), ledger_session_token())
+        self.assertNotIn("28700847", ledger_session_token())
+
+    def test_monthly_ledger_merges_sources_and_decisions(self):
+        with tempfile.TemporaryDirectory() as directory, patch("app.DATA_DIR", Path(directory)), patch("app.DB_PATH", Path(directory) / "test.db"):
+            db = connect()
+            db.execute("INSERT INTO bulletin_tenders VALUES (?,?,?,?,?,?,?)",
+                ("g1", "衛生局", "醫療設備", "2026-09-05", "https://example.test/g1", "https://example.test/b", "now"))
+            db.execute("INSERT INTO hengqin_tenders VALUES (?,?,?,?,?,?)",
+                ("h1", "合作區", "辦公用品", "2026-09-06", "https://example.test/h1", "now"))
+            db.execute("INSERT INTO pcp_tenders VALUES (?,?,?,?,?,?)",
+                ("p1", "公共採購平台", "資訊設備", "2026-10-02", "https://example.test/p1", "now"))
+            db.execute("INSERT INTO tender_decisions VALUES (?,?,?,?)",
+                ("gazette", "g1", "participate", "2026-09-07T00:00:00+00:00"))
+            db.commit()
+            items = ledger(db, "2026-09")
+            range_items = ledger(db, "2026-09", "2026-10")
+            db.close()
+        self.assertEqual([item["tender_id"] for item in items], ["h1", "g1"])
+        self.assertEqual([item["tender_id"] for item in range_items], ["p1", "h1", "g1"])
+        self.assertIsNone(items[0]["decision"])
+        self.assertEqual(items[1]["decision"], "participate")
 
 
 if __name__ == "__main__":
