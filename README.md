@@ -34,7 +34,7 @@ LEDGER_SESSION_SECRET=請設定一個長度足夠的隨機字串
 
 设置 `REFRESH_TOKEN` 后，手动刷新接口需提供 `Authorization: Bearer <令牌>`；同时网页上的公开刷新按钮将无法使用，适合生产环境。定时刷新不受影响。
 
-右上角“台账”入口提供按月份汇总的内部招标决策台账，默认口令为 `28700847`。生产环境请务必通过 `LEDGER_PASSWORD` 更换口令，并固定设置 `LEDGER_SESSION_SECRET`（否则服务重启会令现有登录失效）。台账汇总公报、公共采购平台及横琴来源，可记录“参与投标／放弃投标”、修改决策及打印当月报表。
+右上角“台账”入口提供按月份汇总的内部招标决策台账，默认口令为 `28700847`。生产环境请务必通过 `LEDGER_PASSWORD` 更换口令，并固定设置 `LEDGER_SESSION_SECRET`（否则服务重启会令现有登录失效）。台账汇总公报、公共采购平台及横琴来源，可选择单月或连续多个月份（每次最多 24 个月），并可记录“参与投标／放弃投标”、修改决策及打印所选期间报表。
 
 ## 接口
 
@@ -42,7 +42,8 @@ LEDGER_SESSION_SECRET=請設定一個長度足夠的隨機字串
 * `GET /api/tenders?agency=&q=`：按机构或关键词检索公报事项
 * `POST /api/refresh`：立即刷新澳门公报事项及横琴最新采购招标
 * `POST /api/ledger/login`：验证台账口令并建立仅限当前站点的登录会话
-* `GET /api/ledger?month=YYYY-MM`：读取指定月份台账（需登录）
+* `GET /api/ledger?month=YYYY-MM`：读取指定单月台账（需登录，保留兼容）
+* `GET /api/ledger?start_month=YYYY-MM&end_month=YYYY-MM`：读取包含起止月份的多月汇总台账（需登录，最多 24 个月）
 * `POST /api/ledger/decision`：保存或修改参标决策（需登录）
 * `GET /healthz`：容器健康检查
 

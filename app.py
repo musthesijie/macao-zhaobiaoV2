@@ -237,11 +237,17 @@ def valid_month(value):
     return bool(re.fullmatch(r"20\d{2}-(?:0[1-9]|1[0-2])", value or ""))
 
 
-def ledger(db, month):
-    """Build one monthly register across all collected procurement sources."""
-    start = f"{month}-01"
-    year, number = map(int, month.split("-"))
-    end = f"{year + (number == 12):04d}-{1 if number == 12 else number + 1:02d}-01"
+def month_index(value):
+    year, month = map(int, value.split("-"))
+    return year * 12 + month - 1
+
+
+def ledger(db, start_month, end_month=None):
+    """Build a register for one month or an inclusive range of months."""
+    end_month = end_month or start_month
+    start = f"{start_month}-01"
+    end_index = month_index(end_month) + 1
+    end = f"{end_index // 12:04d}-{end_index % 12 + 1:02d}-01"
     rows = db.execute("""SELECT t.*,d.decision,d.decided_at FROM (
         SELECT 'gazette' source_key,id tender_id,published_date,summary title,agency,detail_url,'公報原文' source FROM bulletin_tenders
         UNION ALL SELECT 'pcp',id,published_date,summary,agency,detail_url,'採購平台' FROM pcp_tenders
@@ -322,12 +328,18 @@ class Handler(SimpleHTTPRequestHandler):
         if parsed.path=="/api/ledger/session": return self.json_response({"authenticated":self.ledger_authorized()})
         if parsed.path=="/api/ledger":
             if not self.ledger_authorized(): return self.json_response({"error":"請先輸入口令"},401)
-            month=parse_qs(parsed.query).get("month",[datetime.now().strftime("%Y-%m")])[0]
-            if not valid_month(month): return self.json_response({"error":"月份格式不正確"},400)
-            db=connect(); items=ledger(db,month); db.close()
+            query=parse_qs(parsed.query); month=query.get("month",[""])[0]
+            start_month=query.get("start_month",[month or datetime.now().strftime("%Y-%m")])[0]
+            end_month=query.get("end_month",[month or start_month])[0]
+            if not valid_month(start_month) or not valid_month(end_month): return self.json_response({"error":"月份格式不正確"},400)
+            span=month_index(end_month)-month_index(start_month)+1
+            if span < 1: return self.json_response({"error":"結束月份不可早於開始月份"},400)
+            if span > 24: return self.json_response({"error":"每次最多匯總連續 24 個月"},400)
+            db=connect(); items=ledger(db,start_month,end_month); db.close()
             counts={key:sum(row["decision"]==key for row in items) for key in ("participate","decline")}
             counts["pending"]=sum(not row["decision"] for row in items)
-            return self.json_response({"month":month,"items":items,"total":len(items),"counts":counts})
+            return self.json_response({"start_month":start_month,"end_month":end_month,"months":span,
+                "items":items,"total":len(items),"counts":counts})
         if parsed.path.startswith("/api/"): return self.json_response({"error":"接口不存在"},404)
         self.path="/index.html" if parsed.path=="/" else parsed.path; return super().do_GET()
     def do_POST(self):
