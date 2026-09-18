@@ -26,17 +26,24 @@ FETCH_WORKERS=4
 TENDER_SOURCE_URL=https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=
 HENGQIN_API_URL=https://www.hengqin.gov.cn/postmeta/i/22178.json
 PCP_API_URL=https://www.pcp.gov.mo/gpcms/web/front/v2/info/selectInfoMoreChannel
+LEDGER_PASSWORD=28700847
+LEDGER_SESSION_SECRET=請設定一個長度足夠的隨機字串
 ```
 
 `REFRESH_INTERVAL` 的单位为秒；保留默认值 `43200` 即为每 12 小时刷新。修改 `.env` 后需执行 `docker compose up -d --build` 让配置生效。可通过看板上的“最后更新”时间或 `GET /api/dashboard` 返回的 `last_refresh` 字段确认自动抓取是否成功。
 
 设置 `REFRESH_TOKEN` 后，手动刷新接口需提供 `Authorization: Bearer <令牌>`；同时网页上的公开刷新按钮将无法使用，适合生产环境。定时刷新不受影响。
 
+右上角“台账”入口提供按月份汇总的内部招标决策台账，默认口令为 `28700847`。生产环境请务必通过 `LEDGER_PASSWORD` 更换口令，并固定设置 `LEDGER_SESSION_SECRET`（否则服务重启会令现有登录失效）。台账汇总公报、公共采购平台及横琴来源，可记录“参与投标／放弃投标”、修改决策及打印当月报表。
+
 ## 接口
 
 * `GET /api/dashboard`：全部机构、每机构最新五则、全澳及横琴最新二十则
 * `GET /api/tenders?agency=&q=`：按机构或关键词检索公报事项
 * `POST /api/refresh`：立即刷新澳门公报事项及横琴最新采购招标
+* `POST /api/ledger/login`：验证台账口令并建立仅限当前站点的登录会话
+* `GET /api/ledger?month=YYYY-MM`：读取指定月份台账（需登录）
+* `POST /api/ledger/decision`：保存或修改参标决策（需登录）
 * `GET /healthz`：容器健康检查
 
 ## 本地运行
