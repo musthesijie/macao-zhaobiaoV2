@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app import (REFRESH_SECONDS, GazetteParser, agency_category, clean_summary,
-    connect, ledger, ledger_session_token, month_index, normalize_hengqin_articles,
+    connect, dashboard, ledger, ledger_session_token, month_index, normalize_hengqin_articles,
     normalize_pcp_tenders, scheduler, valid_month)
 
 
@@ -103,6 +103,27 @@ class LedgerTests(unittest.TestCase):
         self.assertEqual([item["tender_id"] for item in range_items], ["p1", "h1", "g1"])
         self.assertIsNone(items[0]["decision"])
         self.assertEqual(items[1]["decision"], "participate")
+
+
+class DashboardTests(unittest.TestCase):
+    def test_latest_sections_keep_gazette_and_procurement_separate(self):
+        with tempfile.TemporaryDirectory() as directory, patch("app.DATA_DIR", Path(directory)), patch("app.DB_PATH", Path(directory) / "test.db"):
+            db = connect()
+            for number in range(25):
+                date = f"2026-09-{number + 1:02d}"
+                db.execute("INSERT INTO bulletin_tenders VALUES (?,?,?,?,?,?,?)",
+                    (f"g{number:02d}", "衛生局", f"公報項目 {number}", date,
+                     f"https://example.test/g{number}", "https://example.test/b", "now"))
+                db.execute("INSERT INTO pcp_tenders VALUES (?,?,?,?,?,?)",
+                    (f"p{number:02d}", "採購部門", f"平台項目 {number}", date,
+                     f"https://example.test/p{number}", "now"))
+            db.commit()
+            result = dashboard(db)
+            db.close()
+        self.assertEqual(len(result["latest"]), 20)
+        self.assertEqual(len(result["pcp_latest"]), 20)
+        self.assertTrue(all(item["id"].startswith("g") and item["source"] == "公報原文" for item in result["latest"]))
+        self.assertTrue(all(item["id"].startswith("p") and item["source"] == "採購平台" for item in result["pcp_latest"]))
 
 
 if __name__ == "__main__":

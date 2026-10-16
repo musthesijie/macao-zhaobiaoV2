@@ -2,7 +2,7 @@
 
 澳门全部公共机构公开招标资讯的自动收录、检索和展示网站。数据摘自法务局《澳门特别行政区公报》的[公开竞投（服务提供／物品供应）](https://www.bo.dsaj.gov.mo/cn/news/list/b/?d=13&c=&y=)事项分类。
 
-“全澳最新发布”合并《公报》及[澳门公共采购平台](https://www.pcp.gov.mo/)的招标资讯并显示最新二十条；看板也自动收录[横琴粤澳深度合作区采购招标](https://www.hengqin.gov.cn/macao_zh_hans/zwgk/cgzb/index.html?page=1)栏目，显示横琴最新二十条采购招标资讯。
+看板将最新资讯分为三个独立区块：“全澳最新发布”显示《公报》最新二十条，“澳门公共采购平台”显示[公共采购平台](https://www.pcp.gov.mo/)最新二十条，“横琴最新发布”显示[横琴粤澳深度合作区采购招标](https://www.hengqin.gov.cn/macao_zh_hans/zwgk/cgzb/index.html?page=1)最新二十条。
 
 V2 沿用原版 [`macao-zhaobiao`](https://github.com/musthesijie/macao-zhaobiao) 的视觉系统。采集器自动遍历公报事项分类的全部分页，以公报链接去重、按公共机构分组，并在看板为每个机构展示最新五则信息。
 

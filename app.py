@@ -263,16 +263,16 @@ def dashboard(db):
     for name in names:
         items=[public(r) for r in db.execute("SELECT * FROM bulletin_tenders WHERE agency=? ORDER BY published_date DESC,id DESC LIMIT 5",(name,))]
         agencies.append({"name":name,"category":agency_category(name),"items":items})
-    latest=[public(r) for r in db.execute("""SELECT id,agency,summary,published_date,detail_url,source FROM (
-        SELECT id,agency,summary,published_date,detail_url,'公報原文' AS source FROM bulletin_tenders
-        UNION ALL
-        SELECT id,agency,summary,published_date,detail_url,'採購平台' AS source FROM pcp_tenders
-        ) ORDER BY published_date DESC,id DESC LIMIT 20""")]
+    latest=[public(r) for r in db.execute("""SELECT id,agency,summary,published_date,detail_url,'公報原文' AS source
+        FROM bulletin_tenders ORDER BY published_date DESC,id DESC LIMIT 20""")]
+    pcp_latest=[public(r) for r in db.execute("""SELECT id,agency,summary,published_date,detail_url,'採購平台' AS source
+        FROM pcp_tenders ORDER BY published_date DESC,id DESC LIMIT 20""")]
     hengqin_latest=[public(r) for r in db.execute("SELECT * FROM hengqin_tenders ORDER BY published_date DESC,id DESC LIMIT 20")]
     meta=dict(db.execute("SELECT key,value FROM metadata"))
     category_order = list(CATEGORY_AGENCIES) + ["其他"]
     categories = [{"name": category, "count": sum(a["category"] == category for a in agencies)} for category in category_order]
-    return {"agencies":agencies,"categories":categories,"latest":latest,"hengqin_latest":hengqin_latest,"agency_count":len(agencies),
+    return {"agencies":agencies,"categories":categories,"latest":latest,"pcp_latest":pcp_latest,
+        "hengqin_latest":hengqin_latest,"agency_count":len(agencies),
         "total":db.execute("SELECT count(*) FROM bulletin_tenders").fetchone()[0],
         "last_refresh":meta.get("last_refresh"),"last_error":meta.get("last_error"),"source_url":SOURCE_URL}
 
